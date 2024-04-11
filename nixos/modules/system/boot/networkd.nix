@@ -186,6 +186,22 @@ let
         (assertNetdevMacAddress "MACAddress")
       ];
 
+      sectionBridge = checkUnitConfig "Bridge" [
+        (assertOnlyFields [
+          "HelloTimeSec"
+          "MaxAgeSec"
+          "ForwardDelaySec"
+          "AgeingTimeSec"
+          "Priority"
+        ])
+        (assertInt "Id")
+        (assertRange "Id" 0 4094)
+        (assertValueOneOf "GVRP" boolValues)
+        (assertValueOneOf "MVRP" boolValues)
+        (assertValueOneOf "LooseBinding" boolValues)
+        (assertValueOneOf "ReorderHeader" boolValues)
+      ];
+
       sectionVLAN = checkUnitConfig "VLAN" [
         (assertOnlyFields [
           "Id"
@@ -1629,6 +1645,17 @@ let
       description = lib.mdDoc ''
         Each attribute in this set specifies an option in the
         `[Netdev]` section of the unit.  See
+        {manpage}`systemd.netdev(5)` for details.
+      '';
+    };
+
+    bridgeConfig = mkOption {
+      default = {};
+      example = { STP = true; };
+      type = types.addCheck (types.attrsOf unitOption) check.netdev.sectionBridge;
+      description = lib.mdDoc ''
+        Each attribute in this set specifies an option in the
+        `[Bridge]` section of the unit.  See
         {manpage}`systemd.netdev(5)` for details.
       '';
     };
